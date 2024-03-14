@@ -1,0 +1,11 @@
+In Python you get to know the world of Computer Science, Hello World!
+In Python you can use variable to store information, such as string, integer, float, list, tuple and dictionary.
+In Python you can use conditional statement to execute certain move under certain condition.
+In Python you can use loop through a list, tuple or dictionary, and choose what to do which each element.
+In Python you can prompt user to input information and choose what to do with it.
+In Python you can define a function which will do some specific job.
+In Python you can deal with object_oriented programming.
+In Python you can define a classes that represent real-world things and situations.
+In Python you can create objects based on these classes.
+In Python you define the general behavior that a whole category of objects can have.
+In Python you get to know the world of Computer Science, Hello World!

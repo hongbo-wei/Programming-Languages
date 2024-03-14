@@ -1,0 +1,1 @@
+print('Bruce Lee once said, "Be water, my friend."')
