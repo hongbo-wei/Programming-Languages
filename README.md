@@ -1,2 +1,10 @@
 # Programming-Languages
-All kinds of programs by different languages
+Good for beginners - all kinds of programs by different languages
+- C
+- C++
+- C#
+- Go
+- Java
+- Python
+
+- Latex
