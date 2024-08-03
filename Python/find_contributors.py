@@ -1,8 +1,9 @@
 from github import Github
+import os
 
 # Replace with your personal access token
 # You can generate one at https://github.com/settings/tokens
-github_token = "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"
+github_token = os.getenv('GITHUB_TOKEN')
 
 # Replace with the owner and name of the repository
 owner = "openvinotoolkit"
