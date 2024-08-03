@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Chat</title>
+  <style>
+    #chat-boxes {
+      display: flex;
+      justify-content: space-between;
+    }
+    .chat-box {
+      flex: 1;
+      margin: 0 10px;
+    }
+    .message-form {
+      display: flex;
+      margin-top: 10px;
+    }
+    .message-form input {
+      flex: 1;
+    }
+    .message-form button {
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="user-connected" style="display: none;"></div>
+  <div id="chat-boxes" style="display: none;">
+    <div id="chat-box-user1" class="chat-box" style="display: none;">
+      <h3 id="user1-heading"></h3>
+      <ul id="messages-user1"></ul>
+      <form id="form-user1" class="message-form">
+        <input id="input-user1" autocomplete="off" /><button>Send</button>
+      </form>
+    </div>
+    <div id="chat-box-user2" class="chat-box" style="display: none;">
+      <h3 id="user2-heading"></h3>
+      <ul id="messages-user2"></ul>
+      <form id="form-user2" class="message-form">
+        <input id="input-user2" autocomplete="off" /><button>Send</button>
+      </form>
+    </div>
+  </div>
+  <p id="user-join-message" style="display: none;"></p>
+  <div id="username-form">
+    <form id="username-submit-form">
+      <input type="text" id="username" placeholder="Enter your username">
+      <button type="submit" id="submit-username">Submit</button>
+    </form>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    var socket = io();
+    var userConnected = document.getElementById('user-connected');
+    var chatBoxes = document.getElementById('chat-boxes');
+    var usernameForm = document.getElementById('username-form');
+    var usernameInput = document.getElementById('username');
+    var submitUsernameButton = document.getElementById('submit-username');
+
+    var formUser1 = document.getElementById('form-user1');
+    var inputUser1 = document.getElementById('input-user1');
+    var formUser2 = document.getElementById('form-user2');
+    var inputUser2 = document.getElementById('input-user2');
+
+    var submittedUsernames = [];
+    var connectedUsersCount = 0;
+
+    usernameForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      var username = usernameInput.value.trim();
+      if (username) {
+        socket.emit('new user', username);
+        usernameInput.value = '';
+        submittedUsernames.push(username);
+        if (submittedUsernames.length === 1) {
+          showUserJoinMessage(username);
+        } else if (submittedUsernames.length === 2) {
+          usernameForm.style.display = 'none'; // Hide the username submission form
+          hideUserJoinMessage();
+          showUserConnected();
+        }
+      }
+    });
+
+    function showUserJoinMessage(username) {
+      var userJoinMessage = document.getElementById('user-join-message');
+      userJoinMessage.textContent = 'User ' + username + ' joined';
+      userJoinMessage.style.display = 'block';
+    }
+
+    function hideUserJoinMessage() {
+      var userJoinMessage = document.getElementById('user-join-message');
+      userJoinMessage.style.display = 'none';
+    }
+
+    function showUserConnected() {
+      userConnected.textContent = 'Users connected: ' + submittedUsernames.join(', ');
+      userConnected.style.display = 'block';
+      chatBoxes.style.display = 'flex';
+      document.getElementById('chat-box-user1').style.display = 'block';
+      document.getElementById('chat-box-user2').style.display = 'block';
+      document.getElementById('user1-heading').textContent = submittedUsernames[0];
+      document.getElementById('user2-heading').textContent = submittedUsernames[1];
+    }
+
+    socket.on('user count', function(count) {
+      connectedUsersCount = count;
+    });
+
+    formUser1.addEventListener('submit', function(e) {
+      e.preventDefault();
+      if (inputUser1.value) {
+        var message = inputUser1.value;
+        socket.emit('chat message', { username: submittedUsernames[0], message: message });
+        appendMessageToChat('messages-user1', submittedUsernames[0], message);
+        inputUser1.value = '';
+      }
+    });
+
+    formUser2.addEventListener('submit', function(e) {
+      e.preventDefault();
+      if (inputUser2.value) {
+        var message = inputUser2.value;
+        socket.emit('chat message', { username: submittedUsernames[1], message: message });
+        appendMessageToChat('messages-user2', submittedUsernames[1], message);
+        inputUser2.value = '';
+      }
+    });
+
+    socket.on('chat message', function(data) {
+      if (typeof data.message === 'string') {
+        if (data.username === submittedUsernames[0]) {
+          appendMessageToChat('messages-user1', data.username, data.message);
+        } else if (data.username === submittedUsernames[1]) {
+          appendMessageToChat('messages-user2', data.username, data.message);
+        }
+      }
+    });
+
+    function appendMessageToChat(chatId, username, message) {
+      var chat = document.getElementById(chatId);
+      var item = document.createElement('li');
+      item.textContent = username + ': ' + message;
+      chat.appendChild(item);
+    }
+  </script>
+</body>
+</html>
